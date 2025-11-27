@@ -25,15 +25,6 @@ pipeline {
                 sh 'mvn package'
             }
         }
-    }
-
-    post {
-        success {
-            echo '✅ Build completed successfully!'
-        }
-        failure {
-            echo '❌ Build failed!'
-        }        
         stage('SonarQube Analysis') {
             steps {
                 echo "----------- SonarQube Analysis Started ----------"
@@ -41,6 +32,14 @@ pipeline {
                 }
                 echo "----------- SonarQube Analysis Completed ----------"
             }
+    }
+    post {
+        success {
+            echo '✅ Build completed successfully!'
+        }
+        failure {
+            echo '❌ Build failed!'
+        }        
 
     }
 }
