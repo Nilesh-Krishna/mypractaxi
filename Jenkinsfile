@@ -33,6 +33,15 @@ pipeline {
         }
         failure {
             echo '❌ Build failed!'
+        }        
+        stage('SonarQube Analysis') {
+            steps {
+                echo "----------- SonarQube Analysis Started ----------"
+                    sh 'mvn sonar:sonar -Dsonar.projectKey=mypractaxi_mypractaxi -Dsonar.host.url=https://sonarcloud.io -Dsonar.token=${SONAR_TOKEN}'
+                }
+                echo "----------- SonarQube Analysis Completed ----------"
+            }
         }
+
     }
 }
