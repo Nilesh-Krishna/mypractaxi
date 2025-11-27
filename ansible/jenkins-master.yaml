@@ -8,10 +8,15 @@
       apt:
         update_cache: yes
 
-    - name: Install Java
+    - name: Install Java 17
       apt:
-        name: openjdk-11-jdk
+        name: openjdk-17-jdk
         state: present
+
+    - name: Set Java 17 as default
+      alternatives:
+        name: java
+        path: /usr/lib/jvm/java-17-openjdk-amd64/bin/java
 
     - name: Add Jenkins repo key
       apt_key:
