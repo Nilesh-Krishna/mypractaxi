@@ -10,6 +10,11 @@
       apt:
         name: openjdk-17-jdk
         state: present
+        
+    - name: Set Java 17 as default
+      alternatives:
+        name: java
+        path: /usr/lib/jvm/java-17-openjdk-amd64/bin/java
 
     - name: Install Maven
       apt:
