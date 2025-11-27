@@ -1,4 +1,4 @@
-
+SONAR_TOKEN = credentials('SONAR_TOKEN')
 pipeline {
     agent { label 'maven' }
 
