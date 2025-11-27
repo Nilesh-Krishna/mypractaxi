@@ -1,15 +1,21 @@
-- name: Setup Jenkins Agent
+-- name: Setup Jenkins Agent
   hosts: jenkins-slave
   become: yes
   tasks:
+  
     - name: Update apt cache
       apt:
         update_cache: yes
 
-    - name: Install Java
+    - name: Install Java 17
       apt:
-        name: openjdk-11-jdk
+        name: openjdk-17-jdk
         state: present
+        
+    - name: Set Java 17 as default
+      alternatives:
+        name: java
+        path: /usr/lib/jvm/java-17-openjdk-amd64/bin/java
 
     - name: Install Maven
       apt:
@@ -27,7 +33,7 @@
         state: started
         enabled: yes
 
-     - name: Add Jenkins user to docker group
+    - name: Add Jenkins user to docker group
       user:
         name: jenkins
         groups: docker
