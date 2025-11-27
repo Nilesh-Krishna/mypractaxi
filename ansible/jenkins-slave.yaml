@@ -1,4 +1,4 @@
-- name: Setup Jenkins Agent
+-- name: Setup Jenkins Agent
   hosts: jenkins-slave
   become: yes
   tasks:
@@ -32,7 +32,7 @@
         state: started
         enabled: yes
 
-     - name: Add Jenkins user to docker group
+    - name: Add Jenkins user to docker group
       user:
         name: jenkins
         groups: docker
