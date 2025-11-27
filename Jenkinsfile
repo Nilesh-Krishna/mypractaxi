@@ -41,7 +41,6 @@ pipeline {
                 }
                 echo "----------- SonarQube Analysis Completed ----------"
             }
-        }
 
     }
 }
