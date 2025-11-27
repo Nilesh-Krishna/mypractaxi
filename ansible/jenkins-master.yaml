@@ -1,0 +1,42 @@
+---
+- name: Setup Jenkins Master
+  hosts: jenkins-master
+  become: yes
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install Java
+      apt:
+        name: openjdk-11-jdk
+        state: present
+
+    - name: Add Jenkins repo key
+      apt_key:
+        url: https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+        state: present
+
+    - name: Add Jenkins repository
+      apt_repository:
+        repo: 'deb https://pkg.jenkins.io/debian-stable binary/'
+        state: present
+
+    - name: Install Jenkins
+      apt:
+        name: jenkins
+        state: present
+        update_cache: yes
+      notify: restart jenkins
+
+    - name: Ensure Jenkins service is enabled
+      service:
+        name: jenkins
+        enabled: yes
+
+  handlers:
+    - name: restart jenkins
+      service:
+        name: jenkins
+        state: restarted

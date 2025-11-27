@@ -76,7 +76,7 @@ resource "aws_instance" "ansible_server" {
   key_name      = var.key_name
   security_groups = [aws_security_group.jenkins_ansible_sg.name]
 
-  tags {
+  tags = {
     Name = "ansible"
   }
 }
