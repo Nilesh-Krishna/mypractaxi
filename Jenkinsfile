@@ -44,7 +44,7 @@ pipeline {
 
                     // ✅ Create Artifactory server connection
                     def server = Artifactory.newServer(
-                        url: 'https://mycompany.jfrog.io/artifactory',
+                        url: 'https://mypractaxi.jfrog.io/ui/native/taxi-libs-release-local/',
                         credentialsId: 'jfrog-cred' // Jenkins credentials ID
                     )
 
