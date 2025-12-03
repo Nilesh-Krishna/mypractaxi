@@ -48,7 +48,7 @@ stage('Publish to JFrog') {
 
             def jfrogUrl = 'https://<your-jfrog-domain>/artifactory/<your-repo>'
 
-            withCredentials([usernamePassword(credentialsId: 'JFROG_CREDENTIALS', usernameVariable: 'JFROG_USER', passwordVariable: 'JFROG_PASS')]) {
+            withCredentials([usernamePassword(credentialsId: 'jfrog-cred', usernameVariable: 'JFROG_USER', passwordVariable: 'JFROG_PASS')]) {
                 sh """
                     curl -u ${JFROG_USER}:${JFROG_PASS} \
                     -T ${jarFile} \
