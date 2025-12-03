@@ -37,30 +37,30 @@ pipeline {
             }
         }
 
-        stage('Publish to JFrog') {
-            steps {
-                script {
-                    echo "----------- Publishing JAR to JFrog Artifactory ----------"
+        
+stage('Publish to JFrog') {
+    steps {
+        script {
+            echo "----------- Publishing JAR to JFrog Artifactory ----------"
 
-                    // ✅ Dynamically find the first valid JAR (ignoring sources/tests)
-                    def jarFile = sh(script: "find . -name '*.jar' | grep -v 'sources' | grep -v 'tests' | head -n 1", returnStdout: true).trim()
+            // Dynamically find the JAR file
+            def jarFile = sh(script: "find . -name '*.jar' | grep -v 'sources' | grep -v 'tests' | head -n 1", returnStdout: true).trim()
 
-                    // ✅ JFrog Artifactory URL (replace with your actual repo path)
-                    def jfrogUrl = 'https://<your-jfrog-domain>/artifactory/<your-repo>'
+            def jfrogUrl = 'https://<your-jfrog-domain>/artifactory/<your-repo>'
 
-                    // ✅ Securely use Jenkins credentials
-                    withCredentials([usernamePassword(credentialsId: 'JFROG_CREDENTIALS', usernameVariable: 'JFROG_USER', passwordVariable: 'JFROG_PASS')]) {
-                        sh """
-                            curl -u ${JFROG_USER}:${JFROG_PASS} \
-                            -T ${jarFile} \
-                            ${jfrogUrl}/myapp/${BUILD_NUMBER}/$(basename ${jarFile})
-                        """
-                    }
-
-                    echo "----------- JAR Published Successfully ----------"
-                }
+            withCredentials([usernamePassword(credentialsId: 'JFROG_CREDENTIALS', usernameVariable: 'JFROG_USER', passwordVariable: 'JFROG_PASS')]) {
+                sh """
+                    curl -u ${JFROG_USER}:${JFROG_PASS} \
+                    -T ${jarFile} \
+                    ${jfrogUrl}/myapp/${BUILD_NUMBER}/\$(basename ${jarFile})
+                """
             }
+
+            echo "----------- JAR Published Successfully ----------"
         }
+    }
+}
+
     }
 
     post {
