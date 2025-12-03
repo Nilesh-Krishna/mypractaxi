@@ -1,5 +1,4 @@
-def imageName = 'taxi01.jfrog.io/taxi-docker-local/taxiapp'
-def version   = '1.0.1'
+
 pipeline {
     agent { label 'maven' }
 
@@ -38,18 +37,16 @@ pipeline {
             }
         }
 
-        stage('Publish to JFrog') {
+        stage('Publish JAR to JFrog') {
             steps {
                 script {
                     echo "----------- Publishing JAR to JFrog Artifactory ----------"
 
-                    // ✅ Create Artifactory server connection
                     def server = Artifactory.newServer(
                         url: 'https://mypractaxi.jfrog.io/artifactory',
-                        credentialsId: 'jfrog-cred' // Jenkins credentials ID
+                        credentialsId: 'jfrog-cred'
                     )
 
-                    // ✅ Define upload spec (pattern and target repo)
                     def uploadSpec = """{
                         "files": [
                             {
@@ -59,33 +56,38 @@ pipeline {
                         ]
                     }"""
 
-                    // ✅ Upload artifact
                     server.upload(uploadSpec)
 
                     echo "----------- JAR Published Successfully ----------"
                 }
             }
         }
-        stage(" Docker Build ") {
-      steps {
-        script {
-           echo '<--------------- Docker Build Started --------------->'
-           app = docker.build(imageName+":"+version)
-           echo '<--------------- Docker Build Ends --------------->'
-        }
-      }
-    }
-     stage (" Docker Publish "){
-        steps {
-            script {
-               echo '<--------------- Docker Publish Started --------------->'  
-                docker.withRegistry(registry, 'jfrog-cred'){
-                    app.push()
-                }    
-               echo '<--------------- Docker Publish Ended --------------->'  
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    echo "----------- Building Docker Image ----------"
+                    sh 'docker build -t taxi01.jfrog.io/taxi-docker-local/taxiapp:1.0.${BUILD_NUMBER} .'
+                }
             }
         }
-    }
+
+        stage('Push Docker Image to JFrog') {
+            steps {
+                script {
+                    echo "----------- Pushing Docker Image to JFrog ----------"
+
+                    withCredentials([usernamePassword(credentialsId: 'jfrog-cred', usernameVariable: 'JFROG_USER', passwordVariable: 'JFROG_PASS')]) {
+                        sh '''
+                            echo "${JFROG_PASS}" | docker login taxi01.jfrog.io -u "${JFROG_USER}" --password-stdin
+                            docker push taxi01.jfrog.io/taxi-docker-local/taxiapp:1.0.${BUILD_NUMBER}
+                        '''
+                    }
+
+                    echo "----------- Docker Image Pushed Successfully ----------"
+                }
+            }
+        }
     }
 
     post {
