@@ -38,28 +38,28 @@ pipeline {
         }
 
         
+
 stage('Publish to JFrog') {
     steps {
         script {
             echo "----------- Publishing JAR to JFrog Artifactory ----------"
 
-            // Dynamically find the JAR file
-            def jarFile = sh(script: "find . -name '*.jar' | grep -v 'sources' | grep -v 'tests' | head -n 1", returnStdout: true).trim()
-
-            def jfrogUrl = 'https://<your-jfrog-domain>/artifactory/<your-repo>'
+            def jarFile = './server/target/server.jar' // or use dynamic find command if needed
+            def jfrogUrl = 'https://mypractaxi.jfrog.io/ui/repos/tree/General/taxi-libs-release'
 
             withCredentials([usernamePassword(credentialsId: 'jfrog-cred', usernameVariable: 'JFROG_USER', passwordVariable: 'JFROG_PASS')]) {
-                sh """
+                sh '''
                     curl -u ${JFROG_USER}:${JFROG_PASS} \
-                    -T ${jarFile} \
-                    ${jfrogUrl}/myapp/${BUILD_NUMBER}/\$(basename ${jarFile})
-                """
+                    -T ./server/target/server.jar \
+                    https://mycompany.jfrog.io/artifactory/libs-release-local/myapp/${BUILD_NUMBER}/$(basename ./server/target/server.jar)
+                '''
             }
 
             echo "----------- JAR Published Successfully ----------"
         }
     }
 }
+
 
     }
 
