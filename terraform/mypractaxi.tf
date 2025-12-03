@@ -92,3 +92,21 @@ output "jenkins_slave_ip" {
 output "ansible_server_ip" {
   value = aws_instance.ansible_server.public_ip
 }
+
+module "sgs" {
+  source = "../sg_eks"
+  vpc_id = data.aws_vpc.default.id
+}
+
+# EKS Cluster Module
+module "eks" {
+  source     = "../eks"
+  vpc_id     = data.aws_vpc.default.id
+  subnet_ids = data.aws_subnets.default.ids
+  sg_ids     = module.sgs.security_group_public
+}
+
+
+output "eks_cluster_endpoint" {
+  value = module.eks.endpoint
+}
