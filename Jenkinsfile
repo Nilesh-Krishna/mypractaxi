@@ -37,30 +37,34 @@ pipeline {
             }
         }
 
-        
+        stage('Publish to JFrog') {
+            steps {
+                script {
+                    echo "----------- Publishing JAR to JFrog Artifactory ----------"
 
-stage('Publish to JFrog') {
-    steps {
-        script {
-            echo "----------- Publishing JAR to JFrog Artifactory ----------"
+                    // ✅ Create Artifactory server connection
+                    def server = Artifactory.newServer(
+                        url: 'https://mycompany.jfrog.io/artifactory',
+                        credentialsId: 'jfrog-cred' // Jenkins credentials ID
+                    )
 
-            def jarFile = './server/target/server.jar' // or use dynamic find command if needed
-            def jfrogUrl = 'https://mypractaxi.jfrog.io/ui/repos/tree/General/taxi-libs-release'
+                    // ✅ Define upload spec (pattern and target repo)
+                    def uploadSpec = """{
+                        "files": [
+                            {
+                                "pattern": "server/target/*.jar",
+                                "target": "taxi-libs-release-local/myapp/${BUILD_NUMBER}/"
+                            }
+                        ]
+                    }"""
 
-            withCredentials([usernamePassword(credentialsId: 'jfrog-cred', usernameVariable: 'JFROG_USER', passwordVariable: 'JFROG_PASS')]) {
-                sh '''
-                    curl -u ${JFROG_USER}:${JFROG_PASS} \
-                    -T ./server/target/server.jar \
-                    https://mycompany.jfrog.io/artifactory/libs-release-local/myapp/${BUILD_NUMBER}/$(basename ./server/target/server.jar)
-                '''
+                    // ✅ Upload artifact
+                    server.upload(uploadSpec)
+
+                    echo "----------- JAR Published Successfully ----------"
+                }
             }
-
-            echo "----------- JAR Published Successfully ----------"
         }
-    }
-}
-
-
     }
 
     post {
