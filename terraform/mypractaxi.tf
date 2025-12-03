@@ -1,6 +1,17 @@
 provider "aws" {
   region = "us-east-1" # Change to your preferred region
 }
+data "aws_vpc" "default" {
+  default = true
+}
+
+# Get default subnets
+data "aws_subnets" "default" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.default.id]
+  }
+}
 
 # Key Pair (Assuming you have an existing key)
 variable "key_name" {
