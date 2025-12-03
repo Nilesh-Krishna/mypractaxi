@@ -36,6 +36,28 @@ pipeline {
                 }
             }
         }
+        
+        stage('Publish to JFrog') {
+            steps {
+                script {
+                    echo "----------- Publishing JAR to JFrog Artifactory ----------"
+            
+            // Replace these values with your actual details
+                def jfrogUrl = 'https://mypractaxi.jfrog.io/ui/repos/tree/General/taxi-libs-release'
+                def jarFile = sh(script: "find . -name '*.jar' | grep -v 'sources' | grep -v 'tests' | head -n 1", returnStdout: true).trim() // Adjust if your jar name is different
+                def jfrogCreds = credentials('jfrog-cred') // Jenkins credentials ID for JFrog username/password
+            
+                sh """
+                    curl -u ${jfrogCreds_USR}:${jfrogCreds_PSW} \
+                    -T ${jarFile} \
+                    ${jfrogUrl}/myapp/${BUILD_NUMBER}/myapp-${BUILD_NUMBER}.jar
+                """
+            
+                echo "----------- JAR Published Successfully ----------"
+                        }
+                    }
+                }
+
     }
 
     post {
